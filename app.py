@@ -10,12 +10,19 @@ app.secret_key = "secret123"
 # -----------------------------
 HOST_PASSWORD = "admin123"
 
-CLUES = [
-    {"question": "Go to Temple Gate", "answer": "TEMP123"},
-    {"question": "Near Parking Area", "answer": "PARK456"},
+EASY = [
+    {"question": "Temple Gate", "answer": "TEMP123"},
+    {"question": "Parking Area", "answer": "PARK456"},
+]
+
+MEDIUM = [
     {"question": "Lift Entrance", "answer": "LIFT789"},
-    {"question": "Water Tank Area", "answer": "WATER111"},
-    {"question": "Security Cabin", "answer": "SEC222"}
+    {"question": "Water Tank", "answer": "WATER111"},
+]
+
+HARD = [
+    {"question": "Security Cabin", "answer": "SEC222"},
+    {"question": "Terrace Corner", "answer": "TOP999"},
 ]
 
 teams = {}
@@ -94,8 +101,16 @@ def register():
         if team_name in teams:
             return "⚠️ Team already exists"
 
-        clues_copy = CLUES.copy()
-        random.shuffle(clues_copy)
+        easy = EASY.copy()
+        medium = MEDIUM.copy()
+        hard = HARD.copy()
+
+        random.shuffle(easy)
+        random.shuffle(medium)
+        random.shuffle(hard)
+
+# Final sequence: Easy → Medium → Hard
+        clues_copy = easy + medium + hard
 
         teams[team_name] = {
             "leader": leader,

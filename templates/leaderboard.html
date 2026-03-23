@@ -1,7 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
 <h2>Leaderboard</h2>
 
-<ol>
+<ol class="leaderboard">
 {% for team, data in teams %}
-    <li>{{ team }} - {{ data['current'] }} clues solved</li>
+    <li>{{ team }} - {{ data['current'] }}</li>
 {% endfor %}
 </ol>
+{% endblock %}

@@ -1,8 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
 <h2>Register Team</h2>
 
 <form method="POST">
-    Team Name: <input name="team"><br><br>
-    Leader: <input name="leader"><br><br>
-    Password: <input type="password" name="password"><br><br>
+    <input name="team" placeholder="Team Name">
+    <input name="leader" placeholder="Leader Name">
+    <input type="password" name="password" placeholder="Password">
     <button type="submit">Register</button>
 </form>
+
+<a href="/login">Already have account?</a>
+{% endblock %}

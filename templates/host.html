@@ -1,0 +1,14 @@
+<h2>Host Dashboard</h2>
+
+<form action="/start" method="POST">
+    <button type="submit">Start Game</button>
+</form>
+
+<h3>Teams:</h3>
+<ul>
+{% for team in teams %}
+    <li>{{ team }} (Progress: {{ teams[team]['current'] }})</li>
+{% endfor %}
+</ul>
+
+<a href="/leaderboard">View Leaderboard</a>

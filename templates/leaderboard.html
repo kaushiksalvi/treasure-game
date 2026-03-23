@@ -1,0 +1,7 @@
+<h2>Leaderboard</h2>
+
+<ol>
+{% for team, data in teams %}
+    <li>{{ team }} - {{ data['current'] }} clues solved</li>
+{% endfor %}
+</ol>

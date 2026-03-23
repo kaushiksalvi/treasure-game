@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session
+
 import random
 
 app = Flask(__name__)
@@ -9,18 +10,12 @@ app.secret_key = "secret123"
 # -----------------------------
 HOST_PASSWORD = "admin123"
 
-# Master clues
 CLUES = [
-    {"question": "I have keys but no locks. What am I?", "answer": "keyboard"},
-    {"question": "What has a face and two hands but no arms?", "answer": "clock"},
-    {"question": "The more you take, the more you leave behind?", "answer": "footsteps"},
-    {"question": "I speak without a mouth?", "answer": "echo"},
-    {"question": "What runs but never walks?", "answer": "water"},
-    {"question": "I have a neck but no head?", "answer": "bottle"},
-    {"question": "What gets wetter as it dries?", "answer": "towel"},
-    {"question": "What has one eye but cannot see?", "answer": "needle"},
-    {"question": "What has many teeth but cannot bite?", "answer": "comb"},
-    {"question": "What begins with T ends with T?", "answer": "teapot"}
+    {"question": "Go to Temple Gate", "answer": "TEMP123"},
+    {"question": "Near Parking Area", "answer": "PARK456"},
+    {"question": "Lift Entrance", "answer": "LIFT789"},
+    {"question": "Water Tank Area", "answer": "WATER111"},
+    {"question": "Security Cabin", "answer": "SEC222"}
 ]
 
 teams = {}
@@ -36,23 +31,26 @@ def index():
 
 
 # -----------------------------
-# HOST LOGIN
+# HOST LOGIN + DASHBOARD
 # -----------------------------
 @app.route('/host', methods=['GET', 'POST'])
 def host():
     global game_started
 
+    # If form submitted (login attempt)
     if request.method == 'POST':
-        password = request.form['password']
+        password = request.form.get('password')
 
         if password == HOST_PASSWORD:
             session['host'] = True
         else:
             return "❌ Wrong Password"
 
+    # If not logged in → show login page
     if not session.get('host'):
         return render_template('host_login.html')
 
+    # If logged in → show dashboard
     return render_template('host.html', teams=teams, started=game_started)
 
 
@@ -66,6 +64,20 @@ def start():
     if session.get('host'):
         game_started = True
 
+    return redirect('/host')
+
+
+# -----------------------------
+# HOST LOGOUT (IMPORTANT FOR TESTING)
+# -----------------------------
+# @app.route('/logout')
+# def logout():
+#     session.clear()
+#     return redirect('/host')
+
+@app.route('/logout')
+def logout():
+    session.clear()
     return redirect('/host')
 
 
@@ -131,25 +143,28 @@ def team():
 
     current_index = team['current']
 
+    # Finished
     if current_index >= len(team['clues']):
-        return "🏆 Finished!"
+        return "🏆 Congratulations! You finished!"
 
     clue = team['clues'][current_index]
     message = ""
 
     if request.method == 'POST':
-        answer = request.form['answer'].lower().strip()
+        answer = request.form['answer']
 
-        if answer == clue['answer']:
+        if answer.strip().upper() == clue['answer']:
             team['current'] += 1
             return redirect('/team')
         else:
-            message = "❌ Wrong answer"
+            message = "❌ Wrong code"
 
-    return render_template('team.html',
-                           clue=clue['question'],
-                           progress=current_index + 1,
-                           message=message)
+    return render_template(
+        'team.html',
+        clue=clue['question'],
+        progress=current_index + 1,
+        message=message
+    )
 
 
 # -----------------------------
@@ -157,11 +172,21 @@ def team():
 # -----------------------------
 @app.route('/leaderboard')
 def leaderboard():
-    sorted_teams = sorted(teams.items(),
-                          key=lambda x: x[1]['current'],
-                          reverse=True)
+    sorted_teams = sorted(
+        teams.items(),
+        key=lambda x: x[1]['current'],
+        reverse=True
+    )
 
-    return render_template('leaderboard.html', teams=sorted_teams)
+    # Detect who is viewing
+    if session.get('host'):
+        back_url = '/host'
+    elif session.get('team'):
+        back_url = '/team'
+    else:
+        back_url = '/'
+
+    return render_template('leaderboard.html', teams=sorted_teams, back_url=back_url)
 
 
 # -----------------------------
